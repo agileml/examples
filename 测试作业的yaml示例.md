@@ -1,0 +1,85 @@
+## 测试作业的Yaml文件，使用阿里云的基础镜像，并通NAS挂载 代码和数据
+
+
+
+测试作业1：
+
+```yaml
+apiVersion: "kubeflow.org/v1"
+kind: "TFJob"
+metadata:
+  name: "tf-smoke-gpu2"
+spec:
+  tfReplicaSpecs:
+    PS:
+      replicas: 1
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - args:
+            - python
+            - tf_cnn_benchmarks.py
+            - --batch_size=32
+            - --model=resnet50
+            - --variable_update=parameter_server
+            - --flush_stdout=true
+            - --num_gpus=1
+            - --local_parameter_device=cpu
+            - --device=cpu
+            - --data_format=NHWC
+            image: registry.cn-beijing.aliyuncs.com/iielct/ai-job:smoke-cpu
+            name: tensorflow
+            ports:
+            - containerPort: 2222
+              name: tfjob-port
+            volumeMounts:
+              - name: pvc-nas
+                mountPath: "/home"
+            resources:
+              limits:
+                cpu: '1'
+            workingDir: /home/tf-benchmarks/scripts/tf_cnn_benchmarks
+          volumes:
+            - name: pvc-nas
+              persistentVolumeClaim:
+                claimName: pvc-nas
+          restartPolicy: OnFailure
+    Worker:
+      replicas: 20
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - args:
+            - python
+            - tf_cnn_benchmarks.py
+            - --batch_size=32
+            - --model=resnet50
+            - --variable_update=parameter_server
+            - --flush_stdout=true
+            - --num_gpus=1
+            - --local_parameter_device=cpu
+            - --device=gpu
+            - --data_format=NHWC
+            image: registry.cn-beijing.aliyuncs.com/iielct/ai-job:smoke-gpu
+            name: tensorflow
+            ports:
+            - containerPort: 2222
+              name: tfjob-port
+            volumeMounts:
+              - name: pvc-nas
+                mountPath: "/home"
+            resources:
+              limits:
+                nvidia.com/gpu: 1
+            workingDir: /home/tf-benchmarks/scripts/tf_cnn_benchmarks
+          volumes:
+            - name: pvc-nas
+              persistentVolumeClaim:
+                claimName: pvc-nas
+          restartPolicy: OnFailure
+```
+
