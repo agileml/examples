@@ -2,11 +2,7 @@
 
 使用 kubectl get tfjob能查看当前命名空间下所有 tfjob的状态
 
-![image-20191117223146060](C:\Users\zoux\AppData\Roaming\Typora\typora-user-images\image-20191117223146060.png)
-
-
-
-
+![image-20191117224819645](查看集群tfjob的作业状态.assets/image-20191117224819645.png)
 
 tfjob状态共五种：
 
@@ -26,7 +22,7 @@ Completed:   作业已完成
 
 eg:
 
-![image-20191117223657752](C:\Users\zoux\AppData\Roaming\Typora\typora-user-images\image-20191117223657752.png)
+![image-20191117224914468](查看集群tfjob的作业状态.assets/image-20191117224914468.png)
 
 
 

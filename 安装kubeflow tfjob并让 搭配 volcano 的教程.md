@@ -1,11 +1,13 @@
 ## 安装kubeflow tfjob并让 搭配 volcano 的教程
 
 参考网址：
+
+```
 https://www.kubeflow.org/docs/started/k8s/overview/
 https://www.jianshu.com/p/afe262304fd6
 https://yylin1.github.io/2019/01/22/kubeflow-job-scheduling/
 https://www.kubeflow.org/docs/use-cases/job-scheduling/
-
+```
 
 （1）准备工作，安装好 k8s集群，安装好kfctl
 （2）确认你是否有一个默认StorageClass且也配置好了动态pv，确认方法如下:
@@ -24,8 +26,8 @@ default表示这个storageclass是默认的。
 
 
 ​	
-	我这里用的是：
-	    kubectl patch storageclass alicloud-disk-ssd -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+​	我这里用的是：
+​	    kubectl patch storageclass alicloud-disk-ssd -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
 （3）安装kfctl
 
