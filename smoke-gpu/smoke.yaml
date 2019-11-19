@@ -1,10 +1,3 @@
-## 测试作业的Yaml文件，使用阿里云的基础镜像，并通NAS挂载 代码和数据
-
-
-
-测试作业1：
-
-```yaml
 apiVersion: "kubeflow.org/v1"
 kind: "TFJob"
 metadata:
@@ -81,5 +74,3 @@ spec:
               persistentVolumeClaim:
                 claimName: pvc-nas
           restartPolicy: OnFailure
-```
-
