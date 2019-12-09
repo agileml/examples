@@ -1,0 +1,34 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  name: sleep-job
+spec:
+  minAvailable: 1
+  schedulerName: volcano
+  policies:
+    - event: PodEvicted
+      action: RestartJob
+  plugins:
+    ssh: []
+    env: []
+    svc: []
+  maxRetry: 5
+  queue: default
+  tasks:
+    - replicas: 1
+      name: "default-sleep"
+      template:
+        metadata:
+          name: sleep
+        spec:
+          containers:
+            - name: sleep
+              image: zoux/sleep:v2
+              args:
+              - --sleepTime=1
+              resources:
+                limits:
+                  cpu: 800m
+                requests:
+                  cpu: 800m
+          restartPolicy: OnFailure
