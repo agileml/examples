@@ -1,0 +1,40 @@
+apiVersion: batch.volcano.sh/v1alpha1
+kind: Job
+metadata:
+  name: nas-pytorch-job
+spec:
+  minAvailable: 1
+  schedulerName: volcano
+  policies:
+    - event: PodEvicted
+      action: RestartJob
+  plugins:
+    ssh: []
+    env: []
+    svc: []
+  maxRetry: 5
+  queue: default
+  tasks:
+    - replicas: 1
+      name: "task-1"
+      template:
+        metadata:
+          name: pytorch-gpu-job
+        spec:
+          containers:
+            - name: pytorch-gpu-job
+              image: zoux/pytorch:cuda-9.2
+              command: ["python","/code/pytorch.py"]
+              resources:
+                limits:
+                  nvidia.com/gpu: "1"
+                requests:
+                  nvidia.com/gpu: "1"
+              volumeMounts:
+              - name: pvc-sleep
+                mountPath: "/code"
+          volumes:
+            - name: pvc-sleep
+              persistentVolumeClaim:
+                claimName: pvc-sleep
+          restartPolicy: OnFailure
