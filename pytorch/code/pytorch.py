@@ -10,7 +10,7 @@ logger = logging.getLogger("mylog")
 logger.setLevel(level=logging.DEBUG)
 
 # 获取文件日志句柄并设置日志级别，第二层过滤
-handler = logging.FileHandler("/code/log.txt")
+handler = logging.FileHandler("/code/zoux/job1/log.txt")
 handler.setLevel(logging.INFO)
 
 # 生成并设置文件日志格式，其中name为上面设置的mylog
@@ -39,12 +39,12 @@ batch_size = 100
 learning_rate = 0.001
 
 # MNIST dataset
-train_dataset = torchvision.datasets.MNIST(root='/code/minist/',
+train_dataset = torchvision.datasets.MNIST(root='/code/zoux/job1/minist/',
                                            train=True,
                                            transform=transforms.ToTensor(),
                                            download=True)
 
-test_dataset = torchvision.datasets.MNIST(root='/code/minist/',
+test_dataset = torchvision.datasets.MNIST(root='/code/zoux/job1/minist/',
                                           train=False,
                                           transform=transforms.ToTensor())
 
@@ -123,6 +123,6 @@ with torch.no_grad():
     logger.info('Test Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total))
 
 # Save the model checkpoint
-torch.save(model.state_dict(), '/code/model.ckpt')
+torch.save(model.state_dict(), '/code/zoux/job1/model.ckpt')
 
 logger.info("saving model")
