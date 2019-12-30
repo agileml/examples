@@ -119,7 +119,9 @@ yum install -y nfs-utils
 mount -t nfs -o vers=4.0 111df49a6b-qxt10.cn-beijing.nas.aliyuncs.com:/code /nfs/testdata
 ```
 
-***重要：*** 所有训练中使用到的数据（训练程序和训练数据等）和要保存的文件（日志和模型等）一定要放在挂载卷的目录下面 。 为避免数据覆盖，需为每次训练创建一个子目录（后续版本会将这一过程自动化）。以本教程为例，第一次提交作业前都要在/nfs/testdata下创建一个子目录，如/nfs/testdata/zoux/job1，第二次提交作业前创建/nfs/testdata/zoux/job2，。。。（实际数据保存在NAS的/code/zoux/job1目录下。)。创建目录后，设置目录的权限：
+***重要：*** 所有训练中使用到的数据（训练程序和训练数据等）和要保存的文件（日志和模型等）一定要放在挂载卷的目录下面 。 为避免数据覆盖，需为每次训练创建一个子目录（后续版本会将这一过程自动化）。
+
+​       以本教程为例，第一次提交作业前都要在/nfs/testdata下创建一个子目录，如/nfs/testdata/zoux/job1，第二次提交作业前创建/nfs/testdata/zoux/job2，。。。（实际数据保存在NAS的/code/zoux/job1目录下。)。创建目录后，设置目录的权限：
 
  ```rust
 chmod +777 /nfs/testdata/zoux/job1
@@ -247,7 +249,7 @@ kubectl describe pod podName   //这里的podName是一个变量，要替换正�
 
  如果程序出错，执行  kubectl logs podname 命令查看错误输出。 
 
- 执行 Kubectl delete -f job.yaml命令（job.yaml为提交作业时使用的yaml文件名）可删除错误作业。
+ 执行 Kubectl delete -f job.yaml命令（job.yaml为提交作业时使用的yaml文件名）可删除错误作业，或执行kubectl delete   jobs.batch.volcano.sh  jobName。
 
 
 
@@ -268,3 +270,6 @@ kubectl describe pod podName   //这里的podName是一个变量，要替换正�
 ### 挂载错误排查
 
  https://help.aliyun.com/document_detail/129698.html?spm=a2c4g.11186623.2.23.62ebaa3d5K90K2#concept-1614284 
+
+
+
