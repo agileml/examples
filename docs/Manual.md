@@ -18,7 +18,7 @@ sudo docker login --username=iielct registry.cn-beijing.aliyuncs.com
 
 密码：iielct123
 
-![image-20191227113407909](../images/docker registry.png)
+![image-20191227113407909](images/docker registry.png)
 
 (2)  上传自己的镜像到阿里云镜像仓库
 
@@ -38,7 +38,7 @@ docker tag zoux/pytorch:cuda-9.2 registry.cn-beijing.aliyuncs.com/iielct/ai-job:
 docker push registry.cn-beijing.aliyuncs.com/iielct/ai-job:pytorch-cuda-9.2
 ```
 
-![image-20191227114108867](../images/docker push example.png)
+![image-20191227114108867](images/docker push example.png)
 
 等到镜像上传完即可。
 
@@ -64,8 +64,6 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 ```rust
 kubectl version
 ```
-
-
 
 （4）连接到k8s集群
 
@@ -93,13 +91,11 @@ users:
     client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlDV3dJQkFBS0JnUUMwaXFwM2l0NmhZa1IzU1kzNGpFVmhOcGNHbTlEcHVRcXl6M3dKRHRJVTR1RDlHQXdwClI4a01QVnJLT0NYdXZ1OUU4REVCVmhnN044bHRPc2NmQmg0S3Z3bHJRcWhYQ29hWUVBL0Z4S1Yxam9tajJwMkMKSllhYVNsQmxDeEk1ZlovemRXQnV1SldzbnJOVkw0b250SXJsRkNSOTVWbDJsOE5Fa0RYSGJaYmw0d0lEQVFBQgpBb0dBT09NQWQ0NVFPL1drc1JtQ0hIREdZNjA1eFNGUG9IVm53NVBROTJHdUhGcW9uZGIzN2dIcWZXclBzcXdpCmQ2bTk1ckR3SUFXcXVPNEpEOXZYWmhVZFhhbmZMQms3S2lNODMyK1kyMGlsZXRPMzVFaHBiOGkzOXcrWUFxNUEKenBJdDd0TGMvam1CZ3RjRjNXZ0dYdzIwcU1YSzl3R2R2NU9TYk9TdEsxbi9YeEVDUVFET1FhZmJUZ2pZYVJneAp1NHkxeUo4cCtCRGdYMzdlbjVmSnhzR1JUY2phczI5cUhLUVBWcmVMazQreThKcURtK204WHorQmtkakF3UmlQCk1VdDMyRjR0QWtFQTRCVmVsZWFNbVFYOGVtMzVIcml4cnI1em0rMjZEc3ZXakNjZ3U0MThZR3Rzd0p5ZG9QRnkKUjF0U1htRGlLTzIySEtPOG9uTTZKcDlpMWNhU29kVHVUd0pBSS9UY0wyWW1NcHYzcE12ZVZ0NTNxTmhmRU01MQpEcGhoM01JeWdvTTk3YXAwVk5wVFczMHhtRHFNUlpTZVN5MUdEUm5KdDJ2V2pwdmJEVE41eFpYSnJRSkFZbzBqCmJ6dlpSQWVjOWQ5ZC9BUHdxVkM3bWExZzhkYjJRZWVIZnRVSUNZUFZiWlN6d3EvTnVkSlJGSTc1aUZTYmpsYjQKeEYxM0NydDRoVnB5N05ld0F3SkFOS1B6SWUyc0I0bVNpWWVacFFYaFBoNDF0TDIwb0tFMjZBOXpKQkI3Ykc0WQpTU0RlWlFqTFljV1pneWlzaFZuS1ZaOElIR0F6Sy9LTlJpYXJTZkRWQWc9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
 ```
 
-
-
 (5)查看是否连接成功
 
 kubectl get node
 
-![image-20191225165245601](../images/node status.png)
+![image-20191225165245601](images/node status.png)
 
 
 
@@ -123,12 +119,13 @@ yum install -y nfs-utils
 mount -t nfs -o vers=4.0 111df49a6b-qxt10.cn-beijing.nas.aliyuncs.com:/code /nfs/testdata
 ```
 
+***重要：*** 所有训练中使用到的数据（训练程序和训练数据等）和要保存的文件（日志和模型等）一定要放在挂载卷的目录下面 。 为避免数据覆盖，需为每次训练创建一个子目录（后续版本会将这一过程自动化）。以本教程为例，第一次提交作业前都要在/nfs/testdata下创建一个子目录，如/nfs/testdata/zoux/job1，第二次提交作业前创建/nfs/testdata/zoux/job2，。。。（实际数据保存在NAS的/code/zoux/job1目录下。)。创建目录后，设置目录的权限：
 
-***重要：*** 所有训练中使用到的数据（训练程序和训练数据等）和要保存的文件（日志和模型等）一定要放在挂载卷的目录下面 。 为避免数据覆盖，需为每次训练创建一个子目录（后续版本会将这一过程自动化）。以本教程为例，每次提交作业前都要在/nfs/testdata下创建一个子目录，如/nfs/testdata/zoux/job1（实际数据保存在NAS的/code/zoux/job1目录下。
+ ```rust
+chmod +777 /nfs/testdata/zoux/job1
+ ```
 
-​         
-
-​         例如，在本教程的yaml例子中 (见第5步)，容器中的挂载地址是/code（挂载目录名可以改变。这里的code和上一步挂载本地目录到NAS文件系统时所用的code是两个不同的目录。这里的code是为作业创建的容器中的一个目录，可以改名；而上一步的code是NAS文件系统中的一个目录，不可以改名），就需要在代码中把所有要保存的文件写入/code目录，才能持久保存。
+​         在本教程的yaml例子中 (见第5步)，容器中的挂载地址是/code（挂载目录名可以改变。这里的code是为作业创建的容器中的一个目录，实际是映射到了NAS文件系统中的/code。NAS中的/code不可改名。NAS中的code同样映射到了客户端的/nfs/testdata目录中。容器的/code、NAS的/code和客户端的/nfs/testdata实际是同一个目录），就需要在代码中把所有要保存的文件写入/code/zoux/job1目录，才能持久保存。
 
 ```rust
  volumeMounts:
@@ -139,19 +136,15 @@ mount -t nfs -o vers=4.0 111df49a6b-qxt10.cn-beijing.nas.aliyuncs.com:/code /nfs
 
 ## 3. 编写模型代码
 
-​	训练日志、模型的保存以及其它需要持久化存储的内容，都需要自己在代码中实现，可以参考pytorch.py。
+​	训练日志、模型的保存以及其它需要持久化存储的内容，都需要自己在代码中实现，可以参考pytorch.py。务必要修改代码中读取和保存数据的语句所使用的路径。
 
-
-
-代码编写完成后，先自行测试通过，再进行后续步骤。
+​    代码编写完成后，先自行测试通过，再进行后续步骤。
 
 ​      
 
 ## 4. 上传代码与训练集
 
-​	
-
-将代码和数据拷贝到 /nfs/testdata 目录下。由于数据实际存储在远程的NAS中（实际保存在NAS的/code目录下），上传过程需要等待一定时间才能完成。
+​	将代码和数据拷贝到/nfs/testdata/zoux/job1目录下。由于数据实际存储在远程的NAS中（实际保存在NAS的/code目录下），上传过程需要等待一定时间才能完成。
 
 <br>
 
@@ -232,9 +225,7 @@ PS：如果创建失败，也会出现显示具体错误原因。一般原因是
 
 使用 " kubectl get pod" 查看job的情况
 
-![image-20191225110411186](../images/pod status.png)
-
-
+![image-20191225110411186](images/pod status.png)
 
 pod 目前有三个正常的状态：**Pending（等待调度）, Running(作业运行中)，Completed（已完成）**。
 
@@ -242,7 +233,7 @@ pod 目前有三个正常的状态：**Pending（等待调度）, Running(作业
 
 ## 8. 下载日志及模型
 
-进入 /nfs/testdata (自己本机的挂载地址) 即可查看日志文件和模型。
+进入/nfs/testdata/zoux/job1 (自己本机的挂载地址) 即可查看日志文件和模型。
 
 
 
