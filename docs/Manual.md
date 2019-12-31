@@ -203,11 +203,47 @@ spec:
           restartPolicy: OnFailure
 ```
 
+command是容器内执行的命令，有两种方式：
+
+- 直接写运行命令，如果带着命令行参数，那参考下面的例子
+
+    ```rust
+    command: ["python", "pytorch.py"]
+    args: ["-train", "-batch_size", "8"]
+    ```
+
+    这种方式有个问题，就是一次只能执行一个命令，不够灵活，如果依赖项在conda之类的虚拟环境中需要激活自己的conda环境，可以采用下面这种方式。
+
+- 编写shell，例如(这里conda 虚拟环境的名字为work)：
+
+    ```shell
+    #!/usr/bin/env bash
+    # >>> conda initialize >>>
+    # !! Contents within this block are managed by 'conda init' !!
+    __conda_setup="$('/home/user/miniconda/envs/py36/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/home/user/miniconda/envs/work/etc/profile.d/conda.sh" ]; then
+            . "/home/user/miniconda/envs/work/etc/profile.d/conda.sh"
+        else
+            export PATH="/home/user/miniconda/envs/work/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+    # <<< conda initialize <<<
+    conda activate work
+    
+    # run command here
+    python pytorch.py -train -batch_size 8
+    ```
+
+    在1-13行初始化conda环境，在16行激活自己的conda环境，19行开始可以连续写很多命令，会依次执行。
 
 
-## 6. 提交作业
+## 6. 提交、删除作业
 
-（1）进入作业的 yaml文件的同级目录，假设job的Yaml文件命名为： job.yaml
+（1）进入 作业的 yaml文件的同级目录，假设job的Yaml文件命名为： job.yaml
 
 （2）使用下面的命令进行创建
 
@@ -219,8 +255,13 @@ kubectl create -f job.yaml
 
 job.batch.volcano.sh/nas-pytorch-job  created
 
-PS：如果创建失败，也会出现显示具体错误原因。一般原因是job命名冲突，以及yaml格式错误（有严格的缩进）
+（3）使用下面的命令删除作业，在作业出错，或者大改的情况下删除作业再重新提交。
 
+```
+kubectl delete -f job.yaml
+```
+
+PS：如果创建失败，也会出现显示具体错误原因。一般原因是job命名冲突，或者yaml格式错误（有严格的缩进）
 
 
 ## 7. 查看作业执行状态
