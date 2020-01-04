@@ -8,6 +8,8 @@
 
 ## 0. 创建Docker镜像
 
+**我们已经为知识组的同学建立好了镜像，具体请看附录B**
+
 ​         不同的用户有自己的训练环境。用户可以定制自己的Docker镜像，这样可以解决环境搭建问题。创建具体镜像的步骤省略，可参考网上教程。接下来详细介绍如何将自己的镜像上传到阿里云镜像仓库中。
 
 （1）登录阿里云Docker Registry
@@ -280,7 +282,7 @@ pod 目前有三个正常的状态：**Pending（等待调度）, Running(作业
 
 
 
-## Appendix. 错误排查
+## Appendix A. 错误排查
 
 如果出现pod的状态是 Error或者是CrashLoopBackOff 。使用下面的命令查看具体原因：
 
@@ -314,3 +316,98 @@ kubectl describe pod podName   //这里的podName是一个变量，要替换正�
 
 
 
+## Appendix B. docker镜像相关
+
+目前为大家建立了docker镜像，按照收集到的requirement文件，不过在建立的过程中由于阿里云的pip源不全，以及部分库可能包含其他依赖（C库）导致安装失败，所以大家还是需要拉取自己的镜像做微调，同时也方便在本地验证代码的正确性，实验室在阿里云上建立了镜像仓库，仓库地址
+
+```
+registry.cn-beijing.aliyuncs.com/iielct/
+username: iielct
+password: iielct123
+```
+为大家建立的docker镜像列表（发送requirements的同学），名称为名字首字母小写-dev:版本号
+
+```shell
+registry.cn-beijing.aliyuncs.com/iielct/zy-dev     1.0                 9b361a82db03
+registry.cn-beijing.aliyuncs.com/iielct/sp-dev     1.0                 b0c9611c3b63
+registry.cn-beijing.aliyuncs.com/iielct/qwh-dev    1.0                 e50e80d383b3
+registry.cn-beijing.aliyuncs.com/iielct/wlw-dev    1.0                 737a62dfa3b3
+registry.cn-beijing.aliyuncs.com/iielct/sxh-dev    1.0                 a1c9f304359f
+registry.cn-beijing.aliyuncs.com/iielct/wdj-dev    1.0                 3004884c6286
+registry.cn-beijing.aliyuncs.com/iielct/ycy-dev    1.0                 f98022bd2f07
+registry.cn-beijing.aliyuncs.com/iielct/zwb-dev    1.0                 8d2527648642
+registry.cn-beijing.aliyuncs.com/iielct/zl-dev     1.0                 d53a58641632
+registry.cn-beijing.aliyuncs.com/iielct/lyx-dev    1.0                 9479281f9b62
+registry.cn-beijing.aliyuncs.com/iielct/mqw-dev    1.0                 d37f5a74d882
+registry.cn-beijing.aliyuncs.com/iielct/lsw-dev    1.0.1               531ac9403099
+registry.cn-beijing.aliyuncs.com/iielct/lmm-dev    1.0.1               3cad087707ee
+registry.cn-beijing.aliyuncs.com/iielct/nlp-base   cuda-10.0           4d578c17a968
+```
+
+所有镜像都是基于ubuntu 16.06 64位系统，conda里面有两个虚拟环境，一个是$work$ ，一个是$env$，work是之前测试过程中建立的，基本包含了自然语言处理常用的类库，env是根据大家的requirements建立的，不过一部分包安装失败了。不想折腾的同学可以直接激活work环境试试是否可以满足要求。
+
+##### 安装docker
+
+略
+
+##### 拉取并运行镜像
+
+```shell
+docker run -it [自己的镜像完整路径]:[版本号] /bin/bash
+```
+
+比如
+
+```
+docker run -it registry.cn-beijing.aliyuncs.com/iielct/sxh-dev:1.0 /bin/bash
+```
+
+命令会拉取镜像并运行，直接进入终端，默认激活了env环境。
+
+##### 测试环境
+
+可以通过挂载目录的方式让docker共享本地代码文件夹，本地文件夹需要指定绝对路径，例如我希望本地的/home/user/code/test/指定到docker的/app目录下，可以执行
+
+```
+docker run -it -v /home/user/code/test:/app registry.cn-beijing.aliyuncs.com/iielct/sxh-dev:1.0 /bin/bash
+```
+
+之后就可以在docker里测试代码和补全开发环境了，修改完成记得保存（见下一节）。
+
+##### 保存环境
+
+使用docker的commit命令保存容器为新的镜像，docker run的时候终端会有个容器的id，在终端可以看到，例如运行docker的终端名字
+
+```shell
+(env) user@ad4bce6db5fd:/app$ 
+```
+
+其中ad4bce6db5fd就是容器id，假设此时已经完成了对容器的修改，exit命令退出回到本地终端，运行
+
+```shell
+docker commit ad4bce6db5fd [新镜像名称]
+```
+
+我们为大家的镜像做了版本号，为了区分方便，每次修改建议给不同的版本号，初始默认是1.0，修改之后可以分配为1.0.1，例如
+
+```shell
+docker commit ad4bce6db5fd registry.cn-beijing.aliyuncs.com/iielct/sxh-dev:1.0.1
+```
+
+##### 推送镜像到仓库
+
+```shell
+docker push [镜像名]
+```
+
+例如
+
+```shell
+docker push registry.cn-beijing.aliyuncs.com/iielct/sxh-dev:1.0.1
+```
+
+这样就完成了自己的镜像的更新。后续任务可以指定更新后的镜像了。
+
+##### 其他
+
+未发送依赖库的同学可以以仓库任意镜像为基类（建议用nlp-base）安装前述步骤创建自己的镜像并推送。有问题可以群里问。
